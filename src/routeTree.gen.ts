@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ResultadoRouteImport } from './routes/resultado'
+import { Route as TecladoRouteImport } from './routes/teclado'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResultadoRoute = ResultadoRouteImport.update({
+  id: '/resultado',
+  path: '/resultado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TecladoRoute = TecladoRouteImport.update({
+  id: '/teclado',
+  path: '/teclado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/resultado': typeof ResultadoRoute
+  '/teclado': typeof TecladoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/resultado': typeof ResultadoRoute
+  '/teclado': typeof TecladoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/resultado': typeof ResultadoRoute
+  '/teclado': typeof TecladoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/resultado' | '/teclado'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/resultado' | '/teclado'
+  id: '__root__' | '/' | '/resultado' | '/teclado'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ResultadoRoute: typeof ResultadoRoute
+  TecladoRoute: typeof TecladoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resultado': {
+      id: '/resultado'
+      path: '/resultado'
+      fullPath: '/resultado'
+      preLoaderRoute: typeof ResultadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teclado': {
+      id: '/teclado'
+      path: '/teclado'
+      fullPath: '/teclado'
+      preLoaderRoute: typeof TecladoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ResultadoRoute: ResultadoRoute,
+  TecladoRoute: TecladoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

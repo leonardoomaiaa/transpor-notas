@@ -1,9 +1,9 @@
 {
-  "name": "Transpositor Musical",
+  "name": "Octava",
   "short_name": "Transpositor",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#16181f",
-  "theme_color": "#16181f",
+  "background_color": "#0F1117",
+  "theme_color": "#0F1117",
   "icons": [{ "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }]
 }

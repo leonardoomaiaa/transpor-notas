@@ -19,3 +19,18 @@ describe("transposição", () => {
     expect(transposeNote("F#", 2)).toBe("G#");
   });
 });
+
+import { transposeBetween, relativeOffset, intervalName } from "./transpose";
+describe("entre afinações", () => {
+  it("Sax Alto (Eb) → Sax Tenor (Bb): +5 semitons, 4ª justa", () => {
+    expect(relativeOffset("eb", "bb")).toBe(5);
+    expect(intervalName(5)).toBe("4ª justa");
+    expect(transposeBetween(["A", "D"], "eb", "bb")).toEqual(["D", "G"]);
+  });
+  it("Bb → Som Real: -2", () => {
+    expect(transposeBetween(["D"], "bb", "c")).toEqual(["C"]);
+  });
+  it("Som Real → Eb", () => {
+    expect(transposeBetween(["C", "F", "G"], "c", "eb")).toEqual(["A", "D", "E"]);
+  });
+});

@@ -1,10 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Copy, RotateCcw, Clock, ArrowDown } from "lucide-react";
+import { ArrowLeft, Copy, RotateCcw, Clock, ArrowDown, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import { getInstrument, intervalName, relativeOffset, transposeBetween } from "@/lib/transpose";
 import { addHistory, getSession, setSession, type Session } from "@/lib/store";
 import { HistoryDrawer } from "@/components/HistoryDrawer";
+import { PaywallModal } from "@/components/PaywallModal";
+import { ProBadge } from "@/components/ProBadge";
+import { useSubscription } from "@/lib/use-subscription";
+import { exportTranspositionPdf } from "@/lib/pdf";
 
 export const Route = createFileRoute("/resultado")({
   head: () => ({
@@ -24,18 +28,29 @@ const pretty = (n: string) => n.replace("#", "♯").replace("b", "♭");
 
 function Resultado() {
   const [s, setS] = useState<Session | null>(null);
+  const [paywall, setPaywall] = useState(false);
   const navigate = useNavigate();
   const saved = useRef(false);
+  const sub = useSubscription();
 
   useEffect(() => {
     const cur = getSession();
-    if (!cur.notes.length) { navigate({ to: "/teclado" }); return; }
-    setS(cur);
-    if (!saved.current) {
-      saved.current = true;
-      addHistory({ original: cur.notes, result: transposeBetween(cur.notes, cur.from, cur.to), from: cur.from, to: cur.to });
+    if (!cur.notes.length) {
+      navigate({ to: "/teclado" });
+      return;
     }
-  }, [navigate]);
+    setS(cur);
+    if (sub.loading || saved.current) return;
+    saved.current = true;
+    const result = addHistory(
+      { original: cur.notes, result: transposeBetween(cur.notes, cur.from, cur.to), from: cur.from, to: cur.to },
+      sub.plan,
+    );
+    if (!result.ok) {
+      setPaywall(true);
+      toast(`Você já guardou ${sub.freeLimit} músicas no plano gratuito.`);
+    }
+  }, [navigate, sub.loading, sub.plan, sub.freeLimit]);
 
   if (!s) return <main className="min-h-screen" />;
   const from = getInstrument(s.from), to = getInstrument(s.to);
@@ -43,14 +58,41 @@ function Resultado() {
   const semis = relativeOffset(s.from, s.to);
 
   const copy = async () => {
-    try { await navigator.clipboard.writeText(result.join(" - ")); toast.success("Copiado para a área de transferência!"); }
-    catch { toast.error("Não foi possível copiar"); }
+    try {
+      await navigator.clipboard.writeText(result.join(" - "));
+      toast.success("Copiado para a área de transferência!");
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  };
+
+  const exportPdf = async () => {
+    if (!sub.isPro) {
+      setPaywall(true);
+      return;
+    }
+    try {
+      await exportTranspositionPdf({
+        original: s.notes,
+        result,
+        fromLabel: from.label,
+        toLabel: to.label,
+        fromTuning: from.tuning,
+        toTuning: to.tuning,
+        interval: `${semis} ${semis === 1 ? "semitom" : "semitons"} · ${intervalName(semis)}`,
+      });
+      toast.success("PDF gerado!");
+    } catch {
+      toast.error("Não foi possível gerar o PDF");
+    }
   };
 
   return (
     <main className="mx-auto min-h-screen max-w-md px-4 pb-10 pt-4 animate-in fade-in slide-in-from-right-4">
       <div className="flex items-center gap-2">
-        <Link to="/teclado" className="rounded-xl p-2 transition hover:bg-muted active:scale-95" aria-label="Voltar"><ArrowLeft className="h-5 w-5" /></Link>
+        <Link to="/teclado" className="rounded-xl p-2 transition hover:bg-muted active:scale-95" aria-label="Voltar">
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
         <h1 className="text-lg font-semibold">Resultado</h1>
       </div>
 
@@ -83,6 +125,9 @@ function Resultado() {
         <button onClick={copy} className="col-span-2 flex items-center justify-center gap-2 rounded-2xl bg-gold py-4 font-semibold text-primary-foreground shadow-glow transition active:scale-[0.98]">
           <Copy className="h-5 w-5" /> Copiar Sequência
         </button>
+        <button onClick={exportPdf} className="col-span-2 flex items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 py-3.5 text-sm font-semibold transition active:scale-[0.98]">
+          <FileDown className="h-4 w-4" /> Exportar PDF <ProBadge />
+        </button>
         <button onClick={() => { setSession({ ...s, notes: [] }); navigate({ to: "/teclado" }); }} className="glass flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-semibold transition active:scale-95">
           <RotateCcw className="h-4 w-4" /> Nova Transposição
         </button>
@@ -92,6 +137,16 @@ function Resultado() {
           </button>
         </HistoryDrawer>
       </section>
+
+      <PaywallModal
+        open={paywall}
+        onOpenChange={setPaywall}
+        reason={
+          sub.plan === "free"
+            ? "O plano gratuito guarda até 10 músicas. O PRO libera o histórico ilimitado e a exportação em PDF."
+            : "A exportação em PDF é exclusiva do plano PRO."
+        }
+      />
     </main>
   );
 }

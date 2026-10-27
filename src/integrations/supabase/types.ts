@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           email: string | null
           plan: string
+          simulated: boolean
           subscription_end: string | null
           updated_at: string
           user_id: string
@@ -25,6 +26,7 @@ export type Database = {
         Insert: {
           email?: string | null
           plan?: string
+          simulated?: boolean
           subscription_end?: string | null
           updated_at?: string
           user_id: string
@@ -32,6 +34,7 @@ export type Database = {
         Update: {
           email?: string | null
           plan?: string
+          simulated?: boolean
           subscription_end?: string | null
           updated_at?: string
           user_id?: string

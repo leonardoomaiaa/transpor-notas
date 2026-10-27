@@ -5,13 +5,15 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 
-type AuthSearch = { redirect?: string; motivo?: string };
+type AuthSearch = { redirect?: string | undefined; motivo?: string | undefined };
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): AuthSearch => ({
-    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
-    motivo: typeof search.motivo === "string" ? search.motivo : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): AuthSearch => {
+    const out: AuthSearch = {};
+    if (typeof search["redirect"] === "string") out.redirect = search["redirect"];
+    if (typeof search["motivo"] === "string") out.motivo = search["motivo"];
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "Entrar ou criar conta — Octava" },

@@ -6,6 +6,7 @@ import {
   DEFAULT_FOLDER,
   addFolder,
   getFolders,
+  getHistory,
   moveHistory,
   relativeTime,
   removeFolder,

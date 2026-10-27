@@ -20,12 +20,15 @@ import { useAuth } from "@/lib/auth-context";
 import { PRO_PRICES, brl } from "@/lib/billing";
 import { getHistory, getFolders } from "@/lib/store";
 
-type ContaSearch = { checkout?: "sucesso" | "cancelado" };
+type ContaSearch = { checkout?: "sucesso" | "cancelado" | undefined };
 
 export const Route = createFileRoute("/conta")({
-  validateSearch: (search: Record<string, unknown>): ContaSearch => ({
-    checkout: search.checkout === "sucesso" || search.checkout === "cancelado" ? search.checkout : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): ContaSearch => {
+    const out: ContaSearch = {};
+    const value = search["checkout"];
+    if (value === "sucesso" || value === "cancelado") out.checkout = value;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "Minha conta — Octava" },
@@ -78,7 +81,7 @@ function ContaPage() {
   const manage = async () => {
     setBusy("portal");
     try {
-      const { url } = await portal({ data: undefined });
+      const { url } = await portal();
       window.open(url, "_blank", "noopener");
     } catch (error) {
       toast.error(
@@ -94,7 +97,7 @@ function ContaPage() {
   const simulatePro = async () => {
     setBusy("simulate");
     try {
-      await simulate({ data: undefined });
+      await simulate();
       toast.success("PRO liberado em modo de teste!");
       sub.refresh();
     } catch (error) {

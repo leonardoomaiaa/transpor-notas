@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AfinadorRouteImport } from './routes/afinador'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContaRouteImport } from './routes/conta'
 import { Route as MetronomoRouteImport } from './routes/metronomo'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ResultadoRouteImport } from './routes/resultado'
 import { Route as TecladoRouteImport } from './routes/teclado'
 
@@ -25,9 +28,24 @@ const AfinadorRoute = AfinadorRouteImport.update({
   path: '/afinador',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContaRoute = ContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MetronomoRoute = MetronomoRouteImport.update({
   id: '/metronomo',
   path: '/metronomo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultadoRoute = ResultadoRouteImport.update({
@@ -44,14 +62,20 @@ const TecladoRoute = TecladoRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/afinador': typeof AfinadorRoute
+  '/auth': typeof AuthRoute
+  '/conta': typeof ContaRoute
   '/metronomo': typeof MetronomoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resultado': typeof ResultadoRoute
   '/teclado': typeof TecladoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/afinador': typeof AfinadorRoute
+  '/auth': typeof AuthRoute
+  '/conta': typeof ContaRoute
   '/metronomo': typeof MetronomoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resultado': typeof ResultadoRoute
   '/teclado': typeof TecladoRoute
 }
@@ -59,22 +83,53 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/afinador': typeof AfinadorRoute
+  '/auth': typeof AuthRoute
+  '/conta': typeof ContaRoute
   '/metronomo': typeof MetronomoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resultado': typeof ResultadoRoute
   '/teclado': typeof TecladoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/afinador' | '/metronomo' | '/resultado' | '/teclado'
+  fullPaths:
+    | '/'
+    | '/afinador'
+    | '/auth'
+    | '/conta'
+    | '/metronomo'
+    | '/reset-password'
+    | '/resultado'
+    | '/teclado'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/afinador' | '/metronomo' | '/resultado' | '/teclado'
-  id: '__root__' | '/' | '/afinador' | '/metronomo' | '/resultado' | '/teclado'
+  to:
+    | '/'
+    | '/afinador'
+    | '/auth'
+    | '/conta'
+    | '/metronomo'
+    | '/reset-password'
+    | '/resultado'
+    | '/teclado'
+  id:
+    | '__root__'
+    | '/'
+    | '/afinador'
+    | '/auth'
+    | '/conta'
+    | '/metronomo'
+    | '/reset-password'
+    | '/resultado'
+    | '/teclado'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AfinadorRoute: typeof AfinadorRoute
+  AuthRoute: typeof AuthRoute
+  ContaRoute: typeof ContaRoute
   MetronomoRoute: typeof MetronomoRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ResultadoRoute: typeof ResultadoRoute
   TecladoRoute: typeof TecladoRoute
 }
@@ -95,11 +150,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AfinadorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/metronomo': {
       id: '/metronomo'
       path: '/metronomo'
       fullPath: '/metronomo'
       preLoaderRoute: typeof MetronomoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resultado': {
@@ -122,7 +198,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AfinadorRoute: AfinadorRoute,
+  AuthRoute: AuthRoute,
+  ContaRoute: ContaRoute,
   MetronomoRoute: MetronomoRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ResultadoRoute: ResultadoRoute,
   TecladoRoute: TecladoRoute,
 }

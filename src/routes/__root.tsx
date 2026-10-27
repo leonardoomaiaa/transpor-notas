@@ -4,7 +4,6 @@ import {
   createRootRoute,
   createRootRouteWithContext,
 } from "@tanstack/react-router";
-import { Helmet } from "@lovable.dev/vite-plugin-ssr-import/head";
 import { Toaster } from "@/components/ui/sonner";
 import { BottomNav } from "@/components/BottomNav";
 import { AuthProvider } from "@/lib/auth-context";

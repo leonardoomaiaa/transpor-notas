@@ -56,7 +56,7 @@ async function stripeRequest<T>(
       Authorization: stripeAuth(key),
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: init?.form ? encodeForm(init.form) : undefined,
+    body: init?.form ? encodeForm(init.form) : null,
   });
   const json = await response.json().catch(() => ({}));
   if (!response.ok) {

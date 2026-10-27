@@ -10,12 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AfinadorRouteImport } from './routes/afinador'
+import { Route as MetronomoRouteImport } from './routes/metronomo'
 import { Route as ResultadoRouteImport } from './routes/resultado'
 import { Route as TecladoRouteImport } from './routes/teclado'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AfinadorRoute = AfinadorRouteImport.update({
+  id: '/afinador',
+  path: '/afinador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetronomoRoute = MetronomoRouteImport.update({
+  id: '/metronomo',
+  path: '/metronomo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultadoRoute = ResultadoRouteImport.update({
@@ -31,30 +43,38 @@ const TecladoRoute = TecladoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/afinador': typeof AfinadorRoute
+  '/metronomo': typeof MetronomoRoute
   '/resultado': typeof ResultadoRoute
   '/teclado': typeof TecladoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/afinador': typeof AfinadorRoute
+  '/metronomo': typeof MetronomoRoute
   '/resultado': typeof ResultadoRoute
   '/teclado': typeof TecladoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/afinador': typeof AfinadorRoute
+  '/metronomo': typeof MetronomoRoute
   '/resultado': typeof ResultadoRoute
   '/teclado': typeof TecladoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/resultado' | '/teclado'
+  fullPaths: '/' | '/afinador' | '/metronomo' | '/resultado' | '/teclado'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/resultado' | '/teclado'
-  id: '__root__' | '/' | '/resultado' | '/teclado'
+  to: '/' | '/afinador' | '/metronomo' | '/resultado' | '/teclado'
+  id: '__root__' | '/' | '/afinador' | '/metronomo' | '/resultado' | '/teclado'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AfinadorRoute: typeof AfinadorRoute
+  MetronomoRoute: typeof MetronomoRoute
   ResultadoRoute: typeof ResultadoRoute
   TecladoRoute: typeof TecladoRoute
 }
@@ -66,6 +86,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/afinador': {
+      id: '/afinador'
+      path: '/afinador'
+      fullPath: '/afinador'
+      preLoaderRoute: typeof AfinadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metronomo': {
+      id: '/metronomo'
+      path: '/metronomo'
+      fullPath: '/metronomo'
+      preLoaderRoute: typeof MetronomoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resultado': {
@@ -87,6 +121,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AfinadorRoute: AfinadorRoute,
+  MetronomoRoute: MetronomoRoute,
   ResultadoRoute: ResultadoRoute,
   TecladoRoute: TecladoRoute,
 }

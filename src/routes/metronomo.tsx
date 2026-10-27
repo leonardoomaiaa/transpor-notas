@@ -49,8 +49,7 @@ function Metronomo() {
       while (e.next < ctx.currentTime + 0.1) {
         const { bpm: b, beats: n } = cfg.current;
         const idx = e.i % n;
-        // 6/8: acento no 1, secundário no 4
-        click(e.next, idx === 0 || (n === 6 && idx === 3 && false));
+        click(e.next, idx === 0);
         const delay = Math.max(0, (e.next - ctx.currentTime) * 1000);
         setTimeout(() => setBeat(idx), delay);
         e.next += (60 / b) * (n === 6 ? 0.5 : 1);

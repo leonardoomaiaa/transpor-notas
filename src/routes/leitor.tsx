@@ -37,11 +37,11 @@ export function LeitorRoute() {
   const [instrument, setInstrument] = useState<"piano" | "organ" | "flute">("piano");
   const [showMixer, setShowMixer] = useState(false);
 
-  // Posição do cursor de leitura (em porcentagem: 0% a 100%)
+  // Posição do cursor de leitura (em percentagem: 0% a 100%)
   const [cursorProgress, setCursorProgress] = useState(0);
   const [currentBeat, setCurrentBeat] = useState(0);
 
-  // Sequência melódica/harmônica extraída da partitura (demonstração musical)
+  // Sequência melódica/harmónica de demonstração
   const scoreMelody = [
     { note: "C4", dur: 1 },
     { note: "E4", dur: 1 },
@@ -56,11 +56,9 @@ export function LeitorRoute() {
   ];
 
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
   const beatTimerRef = useRef<any>(null);
   const noteIndexRef = useRef(0);
 
-  // Frequências base das notas
   const noteFrequencies: Record<string, number> = {
     "C4": 261.63, "C#4": 277.18, "D4": 293.66, "D#4": 311.13,
     "E4": 329.63, "F4": 349.23, "F#4": 369.99, "G4": 392.0,
@@ -68,7 +66,6 @@ export function LeitorRoute() {
     "C5": 523.25, "C#5": 554.37, "D5": 587.33,
   };
 
-  // Upload e escaneamento da partitura
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -84,13 +81,12 @@ export function LeitorRoute() {
         setIsProcessing(false);
         setCursorProgress(0);
         toast.success("Partitura processada com sucesso!", {
-          description: "Compassos e vozes mapeados no estilo PlayScore.",
+          description: "Compassos e pautas mapeados.",
         });
-      }, 1600);
+      }, 1500);
     }
   };
 
-  // Emissão de som sintetizado (Notas + Metrônomo)
   const playSound = (freq: number, isAccent: boolean) => {
     if (isMuted) return;
     try {
@@ -102,7 +98,6 @@ export function LeitorRoute() {
 
       const adjustedFreq = freq * Math.pow(2, transposeSemi / 12);
 
-      // Sintetizador do Instrumento
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -121,7 +116,6 @@ export function LeitorRoute() {
       osc.start();
       osc.stop(ctx.currentTime + 0.45);
 
-      // Clique rítmico do Metrônomo
       const click = ctx.createOscillator();
       const clickGain = ctx.createGain();
       click.type = "square";
@@ -137,7 +131,6 @@ export function LeitorRoute() {
     }
   };
 
-  // Sincronização e avanço do cursor de partitura
   useEffect(() => {
     if (isPlaying) {
       const beatInterval = (60 / bpm) * 1000;
@@ -151,7 +144,6 @@ export function LeitorRoute() {
 
         noteIndexRef.current = (noteIndexRef.current + 1) % scoreMelody.length;
 
-        // Desloca o cursor proporcionalmente ao longo da pauta da imagem
         setCursorProgress((prev) => {
           if (prev >= 98) return 0;
           return prev + 100 / scoreMelody.length;
@@ -163,7 +155,6 @@ export function LeitorRoute() {
 
     return () => {
       if (beatTimerRef.current) clearInterval(beatTimerRef.current);
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
   }, [isPlaying, bpm, transposeSemi, instrument, isMuted, volume]);
 
@@ -176,7 +167,6 @@ export function LeitorRoute() {
 
   return (
     <div className="min-h-screen bg-[#0E1015] text-white flex flex-col justify-between pb-20 select-none">
-      {/* Topo / Barra Superior */}
       <header className="px-4 py-3 bg-[#161822]/90 backdrop-blur border-b border-gray-800 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <Button
@@ -197,7 +187,6 @@ export function LeitorRoute() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Botão Mixer / Configurações de Vozes */}
           <Button
             variant="outline"
             size="sm"
@@ -212,7 +201,6 @@ export function LeitorRoute() {
         </div>
       </header>
 
-      {/* Área Central / Visualizador da Partitura */}
       <main className="flex-1 relative flex flex-col items-center justify-center p-3 overflow-hidden">
         {!imagePreview ? (
           <div className="w-full max-w-md p-8 border-2 border-dashed border-gray-800 hover:border-amber-500/50 rounded-2xl bg-[#141620]/60 flex flex-col items-center justify-center text-center transition">
@@ -221,12 +209,12 @@ export function LeitorRoute() {
             </div>
             <h2 className="text-base font-semibold mb-1">Escanear Partitura</h2>
             <p className="text-xs text-gray-400 mb-6 max-w-xs">
-              Fotografe ou carregue uma imagem de partitura para iniciar o player interativo.
+              Carregue ou fotografe uma pauta para iniciar o leitor interativo.
             </p>
             <label className="cursor-pointer">
               <Button asChild className="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-6">
                 <span className="flex items-center gap-2">
-                  <Upload className="w-4 h-4" /> Selecionar Arquivo / Foto
+                  <Upload className="w-4 h-4" /> Selecionar Foto
                 </span>
               </Button>
               <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
@@ -234,14 +222,13 @@ export function LeitorRoute() {
           </div>
         ) : (
           <div className="relative w-full max-w-xl h-full max-h-[68vh] rounded-xl overflow-hidden border border-gray-800 bg-[#07080B] flex items-center justify-center shadow-2xl">
-            {/* Foto da Partitura */}
             <img
               src={imagePreview}
               alt="Partitura"
               className="w-full h-full object-contain pointer-events-none"
             />
 
-            {/* CURSOR VERTICAL DE VARREDURA (Estilo PlayScore 2) */}
+            {/* Linha vertical de varredura dinâmica */}
             <div
               className="absolute top-0 bottom-0 w-[2.5px] bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.9)] transition-all duration-150 pointer-events-none z-10"
               style={{ left: `${cursorProgress}%` }}
@@ -249,25 +236,22 @@ export function LeitorRoute() {
               <div className="absolute -top-1 -left-[5px] w-3 h-3 bg-red-500 rounded-full shadow-md" />
             </div>
 
-            {/* Indicador de Processamento */}
             {isProcessing && (
               <div className="absolute inset-0 bg-black/75 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-20">
                 <Sparkles className="w-8 h-8 text-amber-400 animate-spin" />
-                <p className="text-xs font-medium text-amber-200">Reconhecendo compassos e notas...</p>
+                <p className="text-xs font-medium text-amber-200">A processar compassos e notas...</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Modal / Gaveta de Mixer e Ajustes */}
         {showMixer && (
           <div className="absolute top-4 right-4 z-30 w-64 bg-[#181B26]/95 border border-gray-700/80 p-4 rounded-xl shadow-2xl backdrop-blur-md space-y-4">
             <div className="flex items-center justify-between border-b border-gray-800 pb-2">
-              <span className="text-xs font-bold text-gray-200">Mixer de Faixas</span>
-              <span className="text-[10px] text-amber-400 font-mono">Pista 1 (Principal)</span>
+              <span className="text-xs font-bold text-gray-200">Mixer de Pistas</span>
+              <span className="text-[10px] text-amber-400 font-mono">Faixa 1</span>
             </div>
 
-            {/* Timbre do Instrumento */}
             <div>
               <span className="text-[11px] text-gray-400 block mb-1.5">Timbre:</span>
               <div className="grid grid-cols-3 gap-1">
@@ -287,7 +271,6 @@ export function LeitorRoute() {
               </div>
             </div>
 
-            {/* Volume */}
             <div>
               <div className="flex justify-between text-[11px] text-gray-400 mb-1">
                 <span>Volume:</span>
@@ -302,7 +285,6 @@ export function LeitorRoute() {
               />
             </div>
 
-            {/* Transposição Instantânea */}
             <div>
               <div className="flex justify-between text-[11px] text-gray-400 mb-1">
                 <span>Transposição:</span>
@@ -332,10 +314,8 @@ export function LeitorRoute() {
         )}
       </main>
 
-      {/* Barra de Reprodução Inferior (Estilo PlayScore 2) */}
       <footer className="bg-[#141620] border-t border-gray-800 px-4 py-3 flex flex-col gap-2.5 z-20 shadow-lg">
         <div className="flex items-center justify-between max-w-xl mx-auto w-full gap-3">
-          {/* Controles de Playback */}
           <div className="flex items-center gap-1.5">
             <Button
               size="icon"
@@ -369,7 +349,6 @@ export function LeitorRoute() {
             </Button>
           </div>
 
-          {/* Slider de Andamento (BPM) */}
           <div className="flex-1 flex items-center gap-2.5 max-w-xs">
             <Slider
               value={[bpm]}
@@ -384,7 +363,6 @@ export function LeitorRoute() {
             </div>
           </div>
 
-          {/* Botão de Trocar / Enviar Nova Partitura */}
           <label className="cursor-pointer">
             <div className="w-9 h-9 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-300 border border-gray-700 transition">
               <Camera className="w-4 h-4" />
@@ -393,7 +371,6 @@ export function LeitorRoute() {
           </label>
         </div>
 
-        {/* Indicador de Compasso / Metrônomo */}
         {isPlaying && (
           <div className="flex items-center justify-center gap-2 pt-0.5">
             {[0, 1, 2, 3].map((b) => (
